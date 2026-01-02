@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Thank You | Jack Dog Walks</title>
+<link href="/assets/style.css" rel="stylesheet"/>
+</head>
+<body>
+<script src="/assets/mobile-menu.js"></script>
+<header class="site-header">
+<div class="header-inner">
+<div class="brand">
+<a href="/" class="brand-left">
+<img alt="Jack Dog Walks logo" class="logo" src="/assets/images/logo.png"/>
+<div class="brand-text">
+<div class="brand-name">JACK DOG's WALKING SERVICE</div>
+<div class="brand-tagline">Walks from Over to Beyond!</div>
+</div>
+</a>
+<a href="/contact/" class="btn-cta">Get In Touch</a>
+</div>
+<div class="hamburger">
+<span></span>
+<span></span>
+<span></span>
+</div>
+<nav class="nav">
+<a href="/">Home</a>
+<a href="/about-me/">About Me</a>
+<a href="/services-4/">Services</a>
+<a href="/recommendations/">Recommendations</a>
+<a href="/poochy-pics/">Pet Pals Out & About</a>
+<a href="/contact/" class="active">Contact</a>
+<a href="/jack/">Jack</a>
+</nav>
+</div>
+</header>
+
+<main class="content" style="text-align: center; padding: 80px 20px;">
+<div style="max-width: 600px; margin: 0 auto;">
+<h1 style="color: var(--accent); font-size: 48px; margin-bottom: 20px;">Thank You!</h1>
+<p style="font-size: 20px; margin-bottom: 30px;">Your message has been sent successfully. I'll get back to you as soon as possible.</p>
+<p style="font-size: 16px; color: #999; margin-bottom: 40px;">Usually within 24 hours</p>
+
+<div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; margin-bottom: 40px;">
+<h2 style="font-size: 24px; margin-bottom: 20px;">Need to reach me urgently?</h2>
+<p>
+<strong>Email:</strong> <a href="#" id="email-link" style="color: var(--accent); text-decoration: none;">Click to reveal</a>
+</p>
+</div>
+
+<a href="/" class="btn-cta" style="display: inline-block;">Return Home</a>
+</div>
+</main>
+
+<footer class="footer">
+  <p>©2026 by Jack Dog Walks</p>
+  <p>Email me: <a href="mailto:tracey@jack-dog.com" style="color: var(--accent); text-decoration: none;">tracey@jack-dog.com</a></p>
+</footer>
+
+<script>
+// Anti-scraper email reveal
+document.getElementById('email-link').addEventListener('click', function(e) {
+  e.preventDefault();
+  const user = 'tracey';
+  const domain = 'jack-dog.com';
+  const email = user + '@' + domain;
+  this.href = 'mailto:' + email;
+  this.textContent = email;
+  this.onclick = null;
+});
+</script>
+</body>
+</html>

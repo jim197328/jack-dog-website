@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Happy Dogs Out & About - Photo Gallery | Jack Dog Walks</title>
+<meta name="description" content="See happy dogs enjoying their walks around Over's fields and green spaces. Photo updates sent after every walk so you can see your pet's adventure."/>
+<link href="/assets/style.css" rel="stylesheet"/>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    if (!localStorage.getItem('cookieConsent')) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = 'https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css';
+      document.head.appendChild(l);
+
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js';
+      s.onload = function () {
+        window.cookieconsent && window.cookieconsent.initialise({
+          palette: { popup: { background: "#000" }, button: { background: "#f1d600" } },
+          theme: "classic",
+          content: { message: "This site uses cookies to ensure you get the best experience.", dismiss: "OK" }
+        });
+      };
+      document.head.appendChild(s);
+    }
+  } catch (e) {}
+});
+</script>
+</head>
+<body>
+<script src="/assets/mobile-menu.js"></script>
+<header class="site-header">
+<div class="header-inner">
+<div class="brand">
+<a href="/" class="brand-left">
+<img alt="Jack Dog Walks logo" class="logo" src="/assets/images/logo.png"/>
+<div class="brand-text">
+<div class="brand-name">JACK DOG's WALKING SERVICE</div>
+<div class="brand-tagline">Walks from Over to Beyond!</div>
+</div>
+</a>
+<a href="/contact/" class="btn-cta">Get In Touch</a>
+</div>
+<div class="hamburger">
+<span></span>
+<span></span>
+<span></span>
+</div>
+<nav class="nav">
+<a href="/">Home</a>
+<a href="/about-me/">About Me</a>
+<a href="/services-4/">Services</a>
+<a href="/recommendations/">Recommendations</a>
+<a href="/poochy-pics/" class="active">Pet Pals Out & About</a>
+<a href="/contact/">Contact</a>
+<a href="/jack/">Jack</a>
+</nav>
+</div>
+</header>
+<section class="hero" style="background-image:url('/assets/images/hero-images/poochy-pics-hero.jpg?v=20251228a')"><img alt="Jack Dog Walks" src="/assets/images/hero-images/poochy-pics-hero.jpg?v=20251228a"/><div class="hero-overlay"><div class="hero-card"><h1>PET PALS OUT &amp; ABOUT</h1></div></div><a href="/contact/" class="btn-cta mobile-cta">Get In Touch</a></section>
+<main class="content">
+  <h2 style="text-align: center; margin-bottom: 40px;">So Many Happy Pooches...</h2>
+  <div id="dynamic-gallery" class="gallery">
+    </div>
+    <div id="pagination-controls" class="pagination-controls" style="display: none;">
+      <button id="prev-page" class="page-btn">← Previous</button>
+      <span id="page-info" class="page-info"></span>
+      <button id="next-page" class="page-btn">Next →</button>
+    </div>
+</main>
+
+<script src="/assets/gallery-loader.js"></script>
+
+<!-- <main class="content">
+<div class="gallery"><figure><img alt="Dog photo" src="/assets/images/gallery-01.jpg"/><figcaption></figcaption></figure>
+  <figure><img alt="Dog photo" src="/assets/images/gallery-02.jpg"/><figcaption></figcaption></figure>
+  <figure><img alt="Dog photo" src="/assets/images/gallery-03.jpg"/><figcaption></figcaption></figure>
+  <figure><img alt="Dog photo" src="/assets/images/gallery-04.jpg"/><figcaption></figcaption></figure>
+  <figure><img alt="Dog photo" src="/assets/images/gallery-05.jpg"/><figcaption></figcaption></figure>
+  <figure><img alt="Dog photo" src="/assets/images/gallery-06.jpg"/><figcaption></figcaption></figure>
+  <figure><img alt="Dog photo" src="/assets/images/gallery-07.jpg"/><figcaption></figcaption></figure>
+  <figure><img alt="Dog photo" src="/assets/images/gallery-08.jpg"/><figcaption></figcaption></figure>
+  <figure><img alt="Dog photo" src="/assets/images/gallery-09.jpg"/><figcaption></figcaption></figure>
+</div>
+</main> -->
+<footer class="footer">
+  <p>©2026 by Jack Dog Walks</p>
+  <p>Email me: <a href="mailto:tracey@jack-dog.com" style="color: var(--accent); text-decoration: none;">tracey@jack-dog.com</a></p>
+</footer>
+<script src="/assets/lightbox.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/smartcrop@2.0.5/smartcrop.min.js"></script>
+</body>
+</html>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const gallery = document.getElementById('dynamic-gallery');
+    const paginationControls = document.getElementById('pagination-controls');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageInfo = document.getElementById('page-info');
+    const imageFolder = '/assets/images/pooches/';
+    const totalImagesToCheck = 50;
+
+    const COLS = 4;
+    const ROWS = 5;
+    const CELLS_PER_PAGE = COLS * ROWS; // Exact grid: 4 cols x 5 rows = 20 cells
+
+    let validImages = [];
+    let loadedCount = 0;
+    let currentPage = 0;
+    let pages = [];
+
+    for (let i = 1; i <= totalImagesToCheck; i++) {
+      const tempImg = new Image();
+      tempImg.src = `${imageFolder}pooch-${i}.jpg`;
+      tempImg.crossOrigin = 'anonymous'; // Allow smartcrop to analyze
+      tempImg.onload = function() {
+        // Analyze image with smartcrop to find focal point
+        SmartCrop.crop(this, { width: 100, height: 100 }).then(result => {
+          const crop = result.topCrop;
+          // Calculate focal point as percentage
+          const focalX = ((crop.x + crop.width / 2) / this.naturalWidth) * 100;
+          const focalY = ((crop.y + crop.height / 2) / this.naturalHeight) * 100;
+
+          validImages.push({
+            src: this.src,
+            w: this.naturalWidth,
+            h: this.naturalHeight,
+            id: i,
+            focalX: focalX,
+            focalY: focalY
+          });
+          checkCompletion();
+        }).catch(() => {
+          // Fallback if smartcrop fails
+          validImages.push({
+            src: this.src,
+            w: this.naturalWidth,
+            h: this.naturalHeight,
+            id: i,
+            focalX: 50,
+            focalY: 50
+          });
+          checkCompletion();
+        });
+      };
+      tempImg.onerror = checkCompletion;
+    }
+
+    function checkCompletion() {
+      loadedCount++;
+      if (loadedCount === totalImagesToCheck) {
+        preparePages();
+        renderCurrentPage();
+      }
+    }
+
+    function getImageSize(img, index) {
+      const aspect = img.w / img.h;
+
+      // Classify images by actual aspect ratio
+      const isVeryWide = aspect > 2.0;           // Panoramic (> 2:1)
+      const isWide = aspect > 1.4;               // Wide landscape (1.4-2:1)
+      const isModLandscape = aspect > 1.15;      // Moderate landscape (1.15-1.4:1)
+      const isSquare = aspect >= 0.85 && aspect <= 1.15;  // Square (0.85-1.15:1)
+      const isModPortrait = aspect < 0.85 && aspect >= 0.6;  // Moderate portrait (0.6-0.85:1)
+      const isTall = aspect < 0.6 && aspect >= 0.4;          // Tall portrait (0.4-0.6:1)
+      const isVeryTall = aspect < 0.4;                       // Very tall (< 0.4:1)
+
+      // Match cell aspect ratios to image aspect ratios for minimal cropping
+      // Cell aspect ratios: 1×1=1:1, 2×1=2:1, 1×2=0.5:1, 3×1=3:1, 1×3=0.33:1, 2×3=0.67:1, 3×2=1.5:1, 3×3=1:1
+
+      // Very wide panoramic -> 3×1 cells (3:1 ratio)
+      if (isVeryWide) {
+        if (index % 8 === 0) return [3, 1, 'extra-wide'];
+        return [2, 1, 'wide']; // Fallback to 2×1 (2:1 ratio)
+      }
+
+      // Wide landscape -> 2×1 or 3×2 cells
+      if (isWide) {
+        if (index % 7 === 0) return [3, 2, 'tall extra-wide']; // 3×2 = 1.5:1 ratio
+        return [2, 1, 'wide']; // 2×1 = 2:1 ratio
+      }
+
+      // Moderate landscape -> 2×1 cells or 3×2 cells
+      if (isModLandscape) {
+        if (index % 5 === 0) return [3, 2, 'tall extra-wide']; // 3×2 = 1.5:1 ratio (closer match)
+        if (index % 3 === 0) return [2, 1, 'wide']; // 2×1 = 2:1 ratio
+        return [1, 1, '']; // Some stay as 1×1
+      }
+
+      // Square images -> 1×1, 2×2, or 3×3 cells
+      if (isSquare) {
+        if (index % 15 === 0) return [3, 3, 'extra-tall extra-wide']; // 3×3 hero
+        if (index % 6 === 0) return [2, 2, 'big']; // 2×2 hero
+        return [1, 1, '']; // Default square
+      }
+
+      // Moderate portrait -> 2×3 cells (0.67:1 ratio) or 1×2 cells (0.5:1 ratio)
+      if (isModPortrait) {
+        if (index % 7 === 0) return [2, 3, 'extra-tall wide']; // 2×3 = 0.67:1 (better match)
+        return [1, 2, 'tall']; // 1×2 = 0.5:1
+      }
+
+      // Tall portrait -> 1×2 or 1×3 cells
+      if (isTall) {
+        if (index % 5 === 0) return [1, 3, 'extra-tall']; // 1×3 = 0.33:1
+        return [1, 2, 'tall']; // 1×2 = 0.5:1 (closer match)
+      }
+
+      // Very tall portrait -> 1×3 cells (0.33:1 ratio)
+      if (isVeryTall) {
+        return [1, 3, 'extra-tall']; // 1×3 = 0.33:1 (best match)
+      }
+
+      // Default fallback
+      return [1, 1, ''];
+    }
+
+    function preparePages() {
+      validImages.sort((a, b) => b.id - a.id);
+
+      // Prepare all images with their sizes
+      const imagesWithSizes = validImages.map((img, index) => {
+        const [cols, rows, classes] = getImageSize(img, index);
+        return { ...img, cols, rows, classes, used: false };
+      });
+
+      let unusedImages = [...imagesWithSizes];
+
+      while (unusedImages.length > 0) {
+        const pageData = fillPage(unusedImages);
+        if (pageData.images.length === 0) break;
+
+        pages.push(pageData.images);
+        unusedImages = pageData.remainingImages;
+      }
+
+      // Show pagination controls if more than 1 page
+      if (pages.length > 1) {
+        paginationControls.style.display = 'flex';
+      }
+    }
+
+    function fillPage(availableImages) {
+      // Create grid tracker: 0 = empty, 1 = filled
+      const grid = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
+      const pageImages = [];
+      const usedIndices = new Set();
+
+      // First pass: try to place all images by size (largest first helps with packing)
+      const sortedBySize = availableImages
+        .map((img, idx) => ({ img, idx, size: img.cols * img.rows }))
+        .sort((a, b) => b.size - a.size);
+
+      for (const { img, idx } of sortedBySize) {
+        if (usedIndices.has(idx)) continue;
+
+        const placed = tryPlaceImage(grid, img.cols, img.rows, img, img.classes, pageImages);
+        if (placed) {
+          usedIndices.add(idx);
+        }
+
+        if (isGridFull(grid)) break;
+      }
+
+      // Second pass: fill remaining gaps with 1x1 images
+      if (!isGridFull(grid)) {
+        for (let i = 0; i < availableImages.length; i++) {
+          if (usedIndices.has(i)) continue;
+
+          const img = availableImages[i];
+          // Try as 1x1 to fill gaps
+          if (tryPlaceImage(grid, 1, 1, img, '', pageImages)) {
+            usedIndices.add(i);
+          }
+
+          if (isGridFull(grid)) break;
+        }
+      }
+
+      // Return remaining unused images
+      const remainingImages = availableImages.filter((_, idx) => !usedIndices.has(idx));
+
+      return { images: pageImages, remainingImages };
+    }
+
+    function tryPlaceImage(grid, cols, rows, img, classes, pageImages) {
+      // Try to find a position for this image
+      for (let r = 0; r <= ROWS - rows; r++) {
+        for (let c = 0; c <= COLS - cols; c++) {
+          if (canPlaceAt(grid, r, c, rows, cols)) {
+            // Mark grid cells as filled
+            for (let dr = 0; dr < rows; dr++) {
+              for (let dc = 0; dc < cols; dc++) {
+                grid[r + dr][c + dc] = 1;
+              }
+            }
+            pageImages.push({ ...img, cols, rows, classes });
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function canPlaceAt(grid, row, col, rows, cols) {
+      for (let dr = 0; dr < rows; dr++) {
+        for (let dc = 0; dc < cols; dc++) {
+          if (grid[row + dr][col + dc] !== 0) return false;
+        }
+      }
+      return true;
+    }
+
+    function isGridFull(grid) {
+      return grid.every(row => row.every(cell => cell === 1));
+    }
+
+    function renderCurrentPage() {
+      gallery.innerHTML = '';
+
+      if (pages.length === 0) return;
+
+      const pageImages = pages[currentPage];
+      pageImages.forEach(img => {
+        const figure = document.createElement('figure');
+        const pic = document.createElement('img');
+        pic.src = img.src;
+
+        // Apply smart focal point positioning
+        if (img.focalX !== undefined && img.focalY !== undefined) {
+          pic.style.objectPosition = `${img.focalX}% ${img.focalY}%`;
+        }
+
+        if (img.classes) {
+          figure.className = img.classes;
+        }
+
+        figure.appendChild(pic);
+        gallery.appendChild(figure);
+      });
+
+      gallery.classList.add('loaded');
+      updatePaginationControls();
+    }
+
+    function updatePaginationControls() {
+      if (pages.length <= 1) return;
+
+      prevBtn.disabled = currentPage === 0;
+      nextBtn.disabled = currentPage === pages.length - 1;
+      pageInfo.textContent = `Page ${currentPage + 1} of ${pages.length}`;
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        renderCurrentPage();
+        scrollToGallery();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < pages.length - 1) {
+        currentPage++;
+        renderCurrentPage();
+        scrollToGallery();
+      }
+    });
+
+    function scrollToGallery() {
+      // Account for sticky header height
+      const header = document.querySelector('.site-header');
+      const headerHeight = header ? header.offsetHeight : 0;
+      const galleryTop = gallery.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+      window.scrollTo({ top: galleryTop, behavior: 'smooth' });
+    }
+  });
+</script>

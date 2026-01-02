@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Remembering Jack Dog - My Inspiration</title>
+<meta name="description" content="In memory of Jack Dog (2010-2022), the inspiration behind Jack Dog Walks. A faithful friend who lives on in my heart and in the care I give to every pet."/>
+<link href="/assets/style.css" rel="stylesheet"/>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    if (!localStorage.getItem('cookieConsent')) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = 'https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css';
+      document.head.appendChild(l);
+
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js';
+      s.onload = function () {
+        window.cookieconsent && window.cookieconsent.initialise({
+          palette: { popup: { background: "#000" }, button: { background: "#f1d600" } },
+          theme: "classic",
+          content: { message: "This site uses cookies to ensure you get the best experience.", dismiss: "OK" }
+        });
+      };
+      document.head.appendChild(s);
+    }
+  } catch (e) {}
+});
+</script>
+</head>
+<body>
+<script src="/assets/mobile-menu.js"></script>
+<header class="site-header">
+<div class="header-inner">
+<div class="brand">
+<a href="/" class="brand-left">
+<img alt="Jack Dog Walks logo" class="logo" src="/assets/images/logo.png"/>
+<div class="brand-text">
+<div class="brand-name">JACK DOG's WALKING SERVICE</div>
+<div class="brand-tagline">Walks from Over to Beyond!</div>
+</div>
+</a>
+<a href="/contact/" class="btn-cta">Get In Touch</a>
+</div>
+<div class="hamburger">
+<span></span>
+<span></span>
+<span></span>
+</div>
+<nav class="nav">
+<a href="/">Home</a>
+<a href="/about-me/">About Me</a>
+<a href="/services-4/">Services</a>
+<a href="/recommendations/">Recommendations</a>
+<a href="/poochy-pics/">Pet Pals Out & About</a>
+<a href="/contact/">Contact</a>
+<a href="/jack/" class="active">Jack</a>
+</nav>
+</div>
+</header>
+<section class="hero" style="background-image:url('/assets/images/hero-images/jack-hero.jpg?v=20251228a')"><img alt="Jack Dog Walks" src="/assets/images/hero-images/jack-hero.jpg?v=20251228a"/><div class="hero-overlay" style="align-items: flex-end; padding-bottom: 60px;"><div class="hero-card"><h1>JACK DOG</h1></div></div><a href="/contact/" class="btn-cta mobile-cta">Get In Touch</a></section>
+<main class="content" style="text-align: center; margin-bottom: 40px;">
+<h2>Jack - Shelduck Greylag</h2>
+<p><strong>10th April 2010 to 25th July 2022</strong></p>
+<p>Our faithful four-pawed friend, loved and alive still in our hearts forever more.</p>
+</main>
+
+<main class="content">
+  <div id="dynamic-gallery" class="gallery">
+    </div>
+    <div id="pagination-controls" class="pagination-controls" style="display: none;">
+      <button id="prev-page" class="page-btn">← Previous</button>
+      <span id="page-info" class="page-info"></span>
+      <button id="next-page" class="page-btn">Next →</button>
+    </div>
+</main>
+
+<footer class="footer">
+  <p>©2026 by Jack Dog Walks</p>
+  <p>Email me: <a href="mailto:tracey@jack-dog.com" style="color: var(--accent); text-decoration: none;">tracey@jack-dog.com</a></p>
+</footer>
+<script src="/assets/lightbox.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/smartcrop@2.0.5/smartcrop.min.js"></script>
+</body>
+</html>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const gallery = document.getElementById('dynamic-gallery');
+    const paginationControls = document.getElementById('pagination-controls');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageInfo = document.getElementById('page-info');
+    const imageFolder = '/assets/images/jack-dog/';
+    const totalImagesToCheck = 50;
+
+    const COLS = 4;
+    const ROWS = 5;
+    const CELLS_PER_PAGE = COLS * ROWS;
+
+    let validImages = [];
+    let loadedCount = 0;
+    let currentPage = 0;
+    let pages = [];
+
+    for (let i = 1; i <= totalImagesToCheck; i++) {
+      const tempImg = new Image();
+      tempImg.src = `${imageFolder}jack-dog-${i}.jpg`;
+      tempImg.crossOrigin = 'anonymous';
+      tempImg.onload = function() {
+        SmartCrop.crop(this, { width: 100, height: 100 }).then(result => {
+          const crop = result.topCrop;
+          const focalX = ((crop.x + crop.width / 2) / this.naturalWidth) * 100;
+          const focalY = ((crop.y + crop.height / 2) / this.naturalHeight) * 100;
+
+          validImages.push({
+            src: this.src,
+            w: this.naturalWidth,
+            h: this.naturalHeight,
+            id: i,
+            focalX: focalX,
+            focalY: focalY
+          });
+          checkCompletion();
+        }).catch(() => {
+          validImages.push({
+            src: this.src,
+            w: this.naturalWidth,
+            h: this.naturalHeight,
+            id: i,
+            focalX: 50,
+            focalY: 50
+          });
+          checkCompletion();
+        });
+      };
+      tempImg.onerror = checkCompletion;
+    }
+
+    function checkCompletion() {
+      loadedCount++;
+      if (loadedCount === totalImagesToCheck) {
+        preparePages();
+        renderCurrentPage();
+      }
+    }
+
+    function getImageSize(img, index) {
+      const aspect = img.w / img.h;
+
+      const isVeryWide = aspect > 2.0;
+      const isWide = aspect > 1.4;
+      const isModLandscape = aspect > 1.15;
+      const isSquare = aspect >= 0.85 && aspect <= 1.15;
+      const isModPortrait = aspect < 0.85 && aspect >= 0.6;
+      const isTall = aspect < 0.6 && aspect >= 0.4;
+      const isVeryTall = aspect < 0.4;
+
+      if (isVeryWide) {
+        if (index % 8 === 0) return [3, 1, 'extra-wide'];
+        return [2, 1, 'wide'];
+      }
+
+      if (isWide) {
+        if (index % 7 === 0) return [3, 2, 'tall extra-wide'];
+        return [2, 1, 'wide'];
+      }
+
+      if (isModLandscape) {
+        if (index % 5 === 0) return [3, 2, 'tall extra-wide'];
+        if (index % 3 === 0) return [2, 1, 'wide'];
+        return [1, 1, ''];
+      }
+
+      if (isSquare) {
+        if (index % 15 === 0) return [3, 3, 'extra-tall extra-wide'];
+        if (index % 6 === 0) return [2, 2, 'big'];
+        return [1, 1, ''];
+      }
+
+      if (isModPortrait) {
+        if (index % 7 === 0) return [2, 3, 'extra-tall wide'];
+        return [1, 2, 'tall'];
+      }
+
+      if (isTall) {
+        if (index % 5 === 0) return [1, 3, 'extra-tall'];
+        return [1, 2, 'tall'];
+      }
+
+      if (isVeryTall) {
+        return [1, 3, 'extra-tall'];
+      }
+
+      return [1, 1, ''];
+    }
+
+    function preparePages() {
+      validImages.sort((a, b) => b.id - a.id);
+
+      const imagesWithSizes = validImages.map((img, index) => {
+        const [cols, rows, classes] = getImageSize(img, index);
+        return { ...img, cols, rows, classes, used: false };
+      });
+
+      let unusedImages = [...imagesWithSizes];
+
+      while (unusedImages.length > 0) {
+        const pageData = fillPage(unusedImages);
+        if (pageData.images.length === 0) break;
+
+        pages.push(pageData.images);
+        unusedImages = pageData.remainingImages;
+      }
+
+      if (pages.length > 1) {
+        paginationControls.style.display = 'flex';
+      }
+    }
+
+    function fillPage(availableImages) {
+      const grid = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
+      const pageImages = [];
+      const usedIndices = new Set();
+
+      const sortedBySize = availableImages
+        .map((img, idx) => ({ img, idx, size: img.cols * img.rows }))
+        .sort((a, b) => b.size - a.size);
+
+      for (const { img, idx } of sortedBySize) {
+        if (usedIndices.has(idx)) continue;
+
+        const placed = tryPlaceImage(grid, img.cols, img.rows, img, img.classes, pageImages);
+        if (placed) {
+          usedIndices.add(idx);
+        }
+
+        if (isGridFull(grid)) break;
+      }
+
+      if (!isGridFull(grid)) {
+        for (let i = 0; i < availableImages.length; i++) {
+          if (usedIndices.has(i)) continue;
+
+          const img = availableImages[i];
+          if (tryPlaceImage(grid, 1, 1, img, '', pageImages)) {
+            usedIndices.add(i);
+          }
+
+          if (isGridFull(grid)) break;
+        }
+      }
+
+      const remainingImages = availableImages.filter((_, idx) => !usedIndices.has(idx));
+
+      return { images: pageImages, remainingImages };
+    }
+
+    function tryPlaceImage(grid, cols, rows, img, classes, pageImages) {
+      for (let r = 0; r <= ROWS - rows; r++) {
+        for (let c = 0; c <= COLS - cols; c++) {
+          if (canPlaceAt(grid, r, c, rows, cols)) {
+            for (let dr = 0; dr < rows; dr++) {
+              for (let dc = 0; dc < cols; dc++) {
+                grid[r + dr][c + dc] = 1;
+              }
+            }
+            pageImages.push({ ...img, cols, rows, classes });
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function canPlaceAt(grid, row, col, rows, cols) {
+      for (let dr = 0; dr < rows; dr++) {
+        for (let dc = 0; dc < cols; dc++) {
+          if (grid[row + dr][col + dc] !== 0) return false;
+        }
+      }
+      return true;
+    }
+
+    function isGridFull(grid) {
+      return grid.every(row => row.every(cell => cell === 1));
+    }
+
+    function renderCurrentPage() {
+      gallery.innerHTML = '';
+
+      if (pages.length === 0) return;
+
+      const pageImages = pages[currentPage];
+      pageImages.forEach(img => {
+        const figure = document.createElement('figure');
+        const pic = document.createElement('img');
+        pic.src = img.src;
+
+        if (img.focalX !== undefined && img.focalY !== undefined) {
+          pic.style.objectPosition = `${img.focalX}% ${img.focalY}%`;
+        }
+
+        if (img.classes) {
+          figure.className = img.classes;
+        }
+
+        figure.appendChild(pic);
+        gallery.appendChild(figure);
+      });
+
+      gallery.classList.add('loaded');
+      updatePaginationControls();
+    }
+
+    function updatePaginationControls() {
+      if (pages.length <= 1) return;
+
+      prevBtn.disabled = currentPage === 0;
+      nextBtn.disabled = currentPage === pages.length - 1;
+      pageInfo.textContent = `Page ${currentPage + 1} of ${pages.length}`;
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        renderCurrentPage();
+        scrollToGallery();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < pages.length - 1) {
+        currentPage++;
+        renderCurrentPage();
+        scrollToGallery();
+      }
+    });
+
+    function scrollToGallery() {
+      const header = document.querySelector('.site-header');
+      const headerHeight = header ? header.offsetHeight : 0;
+      const galleryTop = gallery.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+      window.scrollTo({ top: galleryTop, behavior: 'smooth' });
+    }
+  });
+</script>
